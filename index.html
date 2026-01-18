@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SNS投稿ライブラリ | Masa</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="logo">SNS投稿ライブラリ</h1>
+            <div class="stats">
+                <span class="stat-item" id="totalPosts">0</span>
+                <span class="stat-label">投稿</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search & Filter -->
+    <div class="search-section">
+        <div class="search-container">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="キーワードで検索...">
+            <button class="clear-btn" id="clearSearch" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="filter-chips">
+            <button class="chip active" data-category="all">すべて</button>
+            <button class="chip" data-category="AIリテラシー">AI</button>
+            <button class="chip" data-category="ビジネス戦略">ビジネス</button>
+            <button class="chip" data-category="学習と習慣">学習</button>
+        </div>
+    </div>
+
+    <!-- Posts Grid -->
+    <main class="posts-container" id="postsContainer">
+        <!-- Posts will be dynamically inserted here -->
+    </main>
+
+    <!-- Post Detail Modal -->
+    <div class="modal" id="postModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">閉じる</button>
+
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be dynamically inserted -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-message">コピーしました</span>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>読み込み中...</p>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
