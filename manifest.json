@@ -1,0 +1,21 @@
+{
+    "name": "SNS投稿ライブラリ",
+    "short_name": "SNS Posts",
+    "description": "SNS投稿候補管理ツール",
+    "start_url": "https://masanobu0328.github.io/sns.postchecker/index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "icons": [
+        {
+            "src": "./icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "./icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
