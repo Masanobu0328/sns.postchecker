@@ -18,11 +18,16 @@ const app = {
 
         Object.keys(postsData).forEach(category => {
             postsData[category].forEach(post => {
+                const prediction = this.generatePrediction(post);
                 this.allPosts.push({
                     ...post,
                     globalId: globalId++,
                     category: category,
-                    categorySlug: categoryInfo[category].slug
+                    categorySlug: categoryInfo[category].slug,
+                    engagementScore: prediction.score,
+                    scoreLevel: prediction.level,
+                    predictionReasons: prediction.reasons,
+                    improvements: prediction.improvements
                 });
             });
         });
@@ -30,6 +35,63 @@ const app = {
         this.filteredPosts = [...this.allPosts];
         this.updateStats();
         this.renderPosts();
+    },
+
+    generatePrediction(post) {
+        let score = 50; // ベーススコア
+        const reasons = [];
+        const improvements = [];
+
+        // タイトルの評価
+        if (post.title.length < 50) {
+            score += 15;
+            reasons.push('✅ タイトルが簡潔で読みやすい');
+        } else {
+            improvements.push('💡 タイトルを50文字以内に短縮すると効果的');
+        }
+
+        // 疑問形や感嘆符
+        if (post.title.includes('？') || post.title.includes('！')) {
+            score += 10;
+            reasons.push('✅ 疑問形・感嘆符で興味を引く');
+        } else {
+            improvements.push('💡 タイトルに疑問形を入れると関心度UP');
+        }
+
+        // 具体的な体験談
+        if (post.content.includes('僕') || post.content.includes('実際')) {
+            score += 15;
+            reasons.push('✅ 具体的な体験談が含まれている');
+        }
+
+        // ペルソナの明確さ
+        if (post.persona.length > 30) {
+            score += 10;
+            reasons.push('✅ ターゲットが明確に定義されている');
+        }
+
+        // 絵文字の使用
+        if (post.content.includes('😊')) {
+            score += 5;
+            reasons.push('✅ 親しみやすい絵文字を使用');
+        } else {
+            improvements.push('💡 絵文字を1-2個追加すると視認性UP');
+        }
+
+        // スコアを0-100に正規化
+        score = Math.min(100, Math.max(0, score));
+
+        // レベル判定
+        let level = 'low';
+        if (score >= 80) level = 'high';
+        else if (score >= 50) level = 'medium';
+
+        return {
+            score,
+            level,
+            reasons: reasons.length > 0 ? reasons : ['投稿の基本要素は揃っています'],
+            improvements: improvements.length > 0 ? improvements : ['現状のまま投稿して問題ありません']
+        };
     },
 
     setupEventListeners() {
@@ -112,22 +174,12 @@ const app = {
 
         container.innerHTML = this.filteredPosts.map(post => `
             <article class="post-card" data-id="${post.globalId}">
-                <div class="post-header">
-                    <div class="post-avatar">M</div>
-                    <div class="post-header-info">
-                        <div class="post-username">Masa</div>
-                        <div class="post-meta-line">
-                            <span class="post-category">${post.category}</span>
-                            <span>·</span>
-                            <span class="post-number">#${post.id}</span>
-                        </div>
-                    </div>
+                <div class="post-header-new">
+                    <span class="engagement-score score-${post.scoreLevel}">${post.engagementScore}点</span>
+                    <span class="post-category-badge">${post.category}</span>
                 </div>
-                <h2 class="post-title">${post.title}</h2>
+                <h2 class="post-title-large">${post.title}</h2>
                 <p class="post-preview">${this.getPreview(post.content)}</p>
-                <div class="post-meta">
-                    <span class="meta-tag">ターゲット設定済</span>
-                </div>
             </article>
         `).join('');
 
@@ -141,8 +193,14 @@ const app = {
     },
 
     getPreview(content) {
-        // 全文を表示
-        return content.replace(/\*\*/g, '').trim();
+        // 最初の2行のみ表示（省略記号付き）
+        const cleanContent = content.replace(/\*\*/g, '').trim();
+        const lines = cleanContent.split('\n');
+
+        if (lines.length > 2) {
+            return lines.slice(0, 2).join('\n') + '...';
+        }
+        return cleanContent;
     },
 
     openModal(postId) {
@@ -154,6 +212,24 @@ const app = {
             <div class="modal-header">
                 <span class="modal-category">${post.category}</span>
                 <h1 class="modal-title">${post.title}</h1>
+            </div>
+            
+            <div class="prediction-section">
+                <h3 class="section-title">📊 投稿予測</h3>
+                <div class="score-display">
+                    <span class="score-number score-${post.scoreLevel}">${post.engagementScore}点</span>
+                    <span class="score-label">伸びる確率: ${post.scoreLevel === 'high' ? '高' : post.scoreLevel === 'medium' ? '中' : '低'}</span>
+                </div>
+                <div class="prediction-details">
+                    <h4>予測理由</h4>
+                    <ul>
+                        ${post.predictionReasons.map(reason => `<li>${reason}</li>`).join('')}
+                    </ul>
+                    <h4>改善提案</h4>
+                    <ul>
+                        ${post.improvements.map(improvement => `<li>${improvement}</li>`).join('')}
+                    </ul>
+                </div>
             </div>
             
             <div class="thread-preview-section">
@@ -173,22 +249,15 @@ const app = {
                         <span class="thread-action">再投稿</span>
                     </div>
                 </div>
+                <button class="copy-btn" onclick="app.copyToClipboard(\`${this.escapeForAttribute(post.content)}\`)">
+                    投稿文をコピー
+                </button>
             </div>
             
             <div class="modal-section">
                 <h3 class="section-title">ターゲット（ペルソナ）</h3>
                 <div class="section-content">
                     <p class="persona-text">${post.persona}</p>
-                </div>
-            </div>
-            
-            <div class="modal-section">
-                <h3 class="section-title">投稿文（編集用）</h3>
-                <div class="section-content">
-                    <p class="post-text">${post.content}</p>
-                    <button class="copy-btn" onclick="app.copyToClipboard(\`${this.escapeForAttribute(post.content)}\`)">
-                        投稿文をコピー
-                    </button>
                 </div>
             </div>
         `;
