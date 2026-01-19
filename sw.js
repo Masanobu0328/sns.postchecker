@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sns-posts-v6';
+const CACHE_NAME = 'sns-posts-v7';
 const urlsToCache = [
     './index.html',
     './style.css',
