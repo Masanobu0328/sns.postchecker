@@ -38,59 +38,85 @@ const app = {
     },
 
     generatePrediction(post) {
-        let score = 50; // ベーススコア
+        let score = 40; // ベーススコア（エキスパート基準）
         const reasons = [];
         const improvements = [];
 
-        // タイトルの評価
-        if (post.title.length < 50) {
-            score += 15;
-            reasons.push('✅ タイトルが簡潔で読みやすい');
+        const lines = post.content.split('\n').filter(l => l.trim());
+        const hook = lines[0] || '';
+        const cta = lines[lines.length - 1] || '';
+
+        // 1. フックの衝撃度 (MAX 20)
+        let hookScore = 0;
+        if (hook.length > 0) {
+            if (/\d+/.test(hook)) hookScore += 8; // 数字による具体性
+            if (hook.includes('！') || hook.includes('？')) hookScore += 5; // 感情/疑問
+            if (hook.includes('「') && hook.includes('」')) hookScore += 7; // カギカッコによる台詞/強調
+        }
+        if (hookScore >= 15) {
+            reasons.push('強いフック：冒頭の一行で読者の注意を引く具体的要素がある');
         } else {
-            improvements.push('💡 タイトルを50文字以内に短縮すると効果的');
+            improvements.push('冒頭の改善：数字や具体的なエピソードを一行目に配置してスクロールを止める工夫を');
         }
+        score += hookScore;
 
-        // 疑問形や感嘆符
-        if (post.title.includes('？') || post.title.includes('！')) {
-            score += 10;
-            reasons.push('✅ 疑問形・感嘆符で興味を引く');
+        // 2. 明快さと読みやすさ (MAX 20)
+        let clarityScore = 0;
+        if (post.content.length < 140) clarityScore += 10; // 文字数（短さは正義）
+        if (post.content.includes('・')) clarityScore += 10; // 箇条書きによる構造化
+
+        if (clarityScore >= 15) {
+            reasons.push('構造の明快さ：箇条書きや適切な文字数で情報の消化を助けている');
         } else {
-            improvements.push('💡 タイトルに疑問形を入れると関心度UP');
+            improvements.push('可読性の向上：箇条書きを活用し、一目で全体像がわかる構造に');
         }
+        score += clarityScore;
 
-        // 具体的な体験談
-        if (post.content.includes('僕') || post.content.includes('実際')) {
-            score += 15;
-            reasons.push('✅ 具体的な体験談が含まれている');
-        }
+        // 3. 提供価値と独自の洞察 (MAX 20)
+        let valueScore = 0;
+        const keywords = ['結論', '理由', 'コツ', '法則', '戦略', '本質', 'AI'];
+        keywords.forEach(kw => {
+            if (post.content.includes(kw)) valueScore += 3;
+        });
+        valueScore = Math.min(20, valueScore);
 
-        // ペルソナの明確さ
-        if (post.persona.length > 30) {
-            score += 10;
-            reasons.push('✅ ターゲットが明確に定義されている');
-        }
-
-        // 絵文字の使用
-        if (post.content.includes('😊')) {
-            score += 5;
-            reasons.push('✅ 親しみやすい絵文字を使用');
+        if (valueScore >= 12) {
+            reasons.push('提供価値：独自の知見や明快な結論が提示されている');
         } else {
-            improvements.push('💡 絵文字を1-2個追加すると視認性UP');
+            improvements.push('価値の追加：その投稿を読むことで読者が得られる「独自の学び」を強調して');
         }
+        score += valueScore;
+
+        // 4. エンゲージメント誘発 (MAX 15)
+        let ctaScore = 0;
+        if (cta.includes('？')) ctaScore += 15;
+
+        if (ctaScore > 0) {
+            reasons.push('高い対話性：末尾の問いかけが自然で、返信のハードルを下げる工夫がある');
+        } else {
+            improvements.push('CTAの強化：最後に具体的な問いかけを置き、読者のアウトプットを促して');
+        }
+        score += ctaScore;
+
+        // 5. インパクト/共有性 (MAX 25)
+        let impactScore = 5;
+        if (post.persona.length > 20) impactScore += 10; // ターゲットが明確
+        if (post.title.length < 40) impactScore += 10; // タイトルがキャッチー
+        score += impactScore;
 
         // スコアを0-100に正規化
         score = Math.min(100, Math.max(0, score));
 
-        // レベル判定
+        // エキスパート基準の判定
         let level = 'low';
-        if (score >= 80) level = 'high';
-        else if (score >= 50) level = 'medium';
+        if (score >= 85) level = 'high'; // 85点以上がエキスパート
+        else if (score >= 60) level = 'medium';
 
         return {
             score,
             level,
-            reasons: reasons.length > 0 ? reasons : ['投稿の基本要素は揃っています'],
-            improvements: improvements.length > 0 ? improvements : ['現状のまま投稿して問題ありません']
+            reasons: reasons.length > 0 ? reasons : ['基本要素をさらに研ぎ澄ます余地があります'],
+            improvements: improvements.length > 0 ? improvements : ['現状でも非常に質が高いですが、時代に合わせて微調整を推奨します']
         };
     },
 
@@ -215,7 +241,7 @@ const app = {
             </div>
             
             <div class="prediction-section">
-                <h3 class="section-title">📊 投稿予測</h3>
+                <h3 class="section-title">投稿予測</h3>
                 <div class="score-display">
                     <span class="score-number score-${post.scoreLevel}">${post.engagementScore}点</span>
                     <span class="score-label">伸びる確率: ${post.scoreLevel === 'high' ? '高' : post.scoreLevel === 'medium' ? '中' : '低'}</span>
