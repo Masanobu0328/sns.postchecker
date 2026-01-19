@@ -12,7 +12,8 @@ const __dirname = path.dirname(__filename);
 const markdownFiles = {
     'AIリテラシー': 'c:/Users/masan/Documents/Obsidian Vault/30_output/SNS/OUT_SNS_AIリテラシー.md',
     'ビジネス戦略': 'c:/Users/masan/Documents/Obsidian Vault/30_output/SNS/OUT_SNS_ビジネス戦略.md',
-    '学習と習慣': 'c:/Users/masan/Documents/Obsidian Vault/30_output/SNS/OUT_SNS_学習と習慣.md'
+    '学習と習慣': 'c:/Users/masan/Documents/Obsidian Vault/30_output/SNS/OUT_SNS_学習と習慣.md',
+    '海外生活・日本比較': 'c:/Users/masan/Documents/Obsidian Vault/30_output/SNS/OUT_SNS_海外生活・日本比較.md'
 };
 
 // Markdownから投稿を抽出
@@ -89,6 +90,11 @@ const categoryInfo = {
         color: "var(--gradient-3)",
         icon: "",
         slug: "learning"
+    },
+    "海外生活・日本比較": {
+        color: "var(--gradient-4)", // 新しいグラデーションを追加
+        icon: "",
+        slug: "global"
     }
 };
 
