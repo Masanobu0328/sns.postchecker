@@ -6,7 +6,7 @@
 // 修正：キャッシュ名を v9 に上げ、marketing.js を追加し、
 // アプリ本体（HTML/JS/CSS）は network-first（失敗時のみキャッシュ）に変えた。
 // 画像類は従来どおり cache-first でよい。
-const CACHE_NAME = 'sns-posts-v9';
+const CACHE_NAME = 'sns-posts-v10';
 const urlsToCache = [
     './index.html',
     './style.css',
