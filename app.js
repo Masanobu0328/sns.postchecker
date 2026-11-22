@@ -170,7 +170,7 @@ const app = {
             });
         }
 
-        // 改訂候補23本（2026-11-22改訂の残り）
+        // 改訂候補22本（2026-11-22改訂の残り）
         if (typeof revisedCandidates !== 'undefined') {
             revisedCandidates.forEach(post => {
                 const enriched = enrich(post, {});

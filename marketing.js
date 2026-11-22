@@ -361,7 +361,7 @@ const accountBaseline = {
 };
 
 
- // 今週のテスト投稿 7本（2026-11-23 Mon 〜 2026-11-29 Sun、20:30 Brisbane / 19:30 Japan、1日1本）
+ // 今週のテスト投稿 7本（2026-11-23 Mon 〜 2026-11-29 Sun、19:00 Brisbane / 18:00 Japan、1日1本）
 // 投稿ルール（docs/POSTING_RULES.md）に従う。1文1行、質問は敬語、意見はカジュアルな文体。
 // 「何だと思う？」は使わない。「教えてください」は入れない。
 // 投稿自体はこのPRでは行わない。Threadsにスケジュール機能はないため、毎回その場で承認を得て即投稿する。
@@ -375,7 +375,7 @@ const testWeekPosts = [
         status: "draft", pillar: "overseas", hookType: "意見を聞く", account: "personal",
         source: "2026-11-22 投稿ルール改訂（Museとの検討）",
         postedAt: null, postUrl: null, result48h: null,
-        testWeek: "2026-11-23", scheduledDate: "2026-11-23", scheduledTime: "20:30",
+        testWeek: "2026-11-23", scheduledDate: "2026-11-23", scheduledTime: "19:00",
         nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
         intent: '職場選びで何を大事にしてるかがわかる。強い意見（絶対、人派です）で反論を呼ぶ。'
     },
@@ -387,7 +387,7 @@ const testWeekPosts = [
         status: "draft", pillar: "overseas", hookType: "意見を聞く", account: "personal",
         source: "2026-11-22 投稿ルール改訂（Museとの検討）",
         postedAt: null, postUrl: null, result48h: null,
-        testWeek: "2026-11-23", scheduledDate: "2026-11-24", scheduledTime: "20:30",
+        testWeek: "2026-11-23", scheduledDate: "2026-11-24", scheduledTime: "19:00",
         nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
         intent: 'セラピストを続ける理由がお金かどうかがわかる。週2、3という具体的な数字でリアルに。'
     },
@@ -399,7 +399,7 @@ const testWeekPosts = [
         status: "draft", pillar: "ai-daily", hookType: "未来を聞く", account: "personal",
         source: "2026-11-22 投稿ルール改訂（Museとの検討）",
         postedAt: null, postUrl: null, result48h: null,
-        testWeek: "2026-11-23", scheduledDate: "2026-11-25", scheduledTime: "20:30",
+        testWeek: "2026-11-23", scheduledDate: "2026-11-25", scheduledTime: "19:00",
         nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
         intent: 'セラピストがAIに期待する具体的な使い方がわかる。'
     },
@@ -411,7 +411,7 @@ const testWeekPosts = [
         status: "draft", pillar: "ai-daily", hookType: "意見を聞く", account: "personal",
         source: "2026-11-22 投稿ルール改訂（Museとの検討）",
         postedAt: null, postUrl: null, result48h: null,
-        testWeek: "2026-11-23", scheduledDate: "2026-11-26", scheduledTime: "20:30",
+        testWeek: "2026-11-23", scheduledDate: "2026-11-26", scheduledTime: "19:00",
         nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
         intent: 'AIで変わる仕事の具体像がわかる。「考える時間が増える」など抽象的な意見は書かない。'
     },
@@ -423,7 +423,7 @@ const testWeekPosts = [
         status: "draft", pillar: "ai-daily", hookType: "実態を聞く", account: "personal",
         source: "2026-11-22 投稿ルール改訂（Museとの検討）",
         postedAt: null, postUrl: null, result48h: null,
-        testWeek: "2026-11-23", scheduledDate: "2026-11-27", scheduledTime: "20:30",
+        testWeek: "2026-11-23", scheduledDate: "2026-11-27", scheduledTime: "19:00",
         nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
         intent: '学生がAIをどう使って勉強してるかがわかる。2文目は不要のため削除。「教えてください」は入れない。'
     },
@@ -435,7 +435,7 @@ const testWeekPosts = [
         status: "draft", pillar: "building-kinapse", hookType: "二択で聞く", account: "personal",
         source: "2026-11-22 投稿ルール改訂（Museとの検討）",
         postedAt: null, postUrl: null, result48h: null,
-        testWeek: "2026-11-23", scheduledDate: "2026-11-28", scheduledTime: "20:30",
+        testWeek: "2026-11-23", scheduledDate: "2026-11-28", scheduledTime: "19:00",
         nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
         intent: '勉強のやり方の価値観がわかる。どっちも大事なため意見は書かない。「暗記」から「知識」に言い換えた。'
     },
@@ -447,7 +447,7 @@ const testWeekPosts = [
         status: "draft", pillar: "building-kinapse", hookType: "二択で聞く", account: "personal",
         source: "2026-11-22 投稿ルール改訂（Museとの検討）",
         postedAt: null, postUrl: null, result48h: null,
-        testWeek: "2026-11-23", scheduledDate: "2026-11-29", scheduledTime: "20:30",
+        testWeek: "2026-11-23", scheduledDate: "2026-11-29", scheduledTime: "19:00",
         nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
         intent: '技術とコミュニケーションのバランス感がわかる。6番（知識と考える力）と被らないよう、知識→技術に変えた。'
     }
@@ -455,7 +455,7 @@ const testWeekPosts = [
 
  // 改訂候補（2026-11-22改訂の残り22本）
 // 今週のテスト投稿7本と重複するものは除く。
-// 2026-11-22の最終修正を全23本に適用：1文1行、質問は敬語・意見はカジュアル、「何だと思う？」と「教えてください」は使わない、
+// 2026-11-22の最終修正を全29本に適用：1文1行、質問は敬語・意見はカジュアル、「何だと思う？」と「教えてください」は使わない、
 // 論点チェック（それを聞いて何がわかるの？）を通らないものは落とすか言い換える、どっちも大事な二択には意見を書かない、重複テーマは片方を別テーマに変える。
 const revisedCandidates = [
     {
