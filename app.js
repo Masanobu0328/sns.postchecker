@@ -31,11 +31,33 @@ const app = {
         }
     },
 
+    // init() は絶対にローディング画面を残したまま終わらない。
+    // loadPosts / setupEventListeners / switchView のどこかで例外が出ても、
+    // finally で必ず hideLoading() し、エラーがあれば画面に理由を出す。
+    // （2026-11-22 の障害：旧 app.js と新 index.html の組み合わせで
+    //  loadPosts が例外を吐き、hideLoading() に到達せず固まった）
     init() {
-        this.loadPosts();
-        this.setupEventListeners();
-        this.switchView('dashboard');
-        this.hideLoading();
+        try {
+            this.loadPosts();
+            this.setupEventListeners();
+            this.switchView('dashboard');
+            window.__snsReady = true;
+        } catch (err) {
+            console.error('SNS投稿ライブラリの起動に失敗しました', err);
+            this.showLoadError(err);
+        } finally {
+            this.hideLoading();
+        }
+    },
+
+    // 起動失敗を画面に表示する（ローディングの下に隠れないよう、overlay を消してから出す）
+    showLoadError(err) {
+        const el = document.getElementById('loadError');
+        if (el) {
+            el.hidden = false;
+            const detail = el.querySelector('[data-error-detail]');
+            if (detail && err) detail.textContent = String(err && err.message ? err.message : err);
+        }
     },
 
     loadPosts() {
@@ -71,15 +93,21 @@ const app = {
 
         Object.keys(postsData).forEach(category => {
             postsData[category].forEach(post => {
-                const marketing = (typeof categoryMarketing !== 'undefined' && categoryMarketing[category]) || {};
-                const enriched = enrich(post, marketing);
-                const prediction = this.generatePrediction(enriched);
-                this.allPosts.push({
-                    ...enriched, globalId: globalId++, category,
-                    categorySlug: categoryInfo[category].slug,
-                    engagementScore: prediction.score, scoreLevel: prediction.level,
-                    predictionReasons: prediction.reasons, improvements: prediction.improvements
-                });
+                // 1件のデータが壊れていても全体を止めない。壊れた投稿だけ飛ばす。
+                try {
+                    const marketing = (typeof categoryMarketing !== 'undefined' && categoryMarketing[category]) || {};
+                    const enriched = enrich(post, marketing);
+                    const prediction = this.generatePrediction(enriched);
+                    this.allPosts.push({
+                        ...enriched, globalId: globalId++, category,
+                        categorySlug: (categoryInfo[category] || {}).slug || 'uncategorized',
+                        engagementScore: prediction.score, scoreLevel: prediction.level,
+                        predictionReasons: prediction.reasons, improvements: prediction.improvements
+                    });
+                } catch (e) {
+                    console.warn('投稿データの読み込みをスキップしました', category, post && post.id, e);
+                    this.skippedPosts = (this.skippedPosts || 0) + 1;
+                }
             });
         });
 
@@ -168,7 +196,11 @@ const app = {
         let score = 40;
         const reasons = [];
         const improvements = [];
-        const lines = post.content.split('\n').filter(l => l.trim());
+        // persona / title / content のいずれかが欠けていても落ちない
+        const content = post.content || '';
+        const persona = post.persona || '';
+        const title = post.title || '';
+        const lines = content.split('\n').filter(l => l.trim());
         const hook = lines[0] || '';
         const cta = lines[lines.length - 1] || '';
 
@@ -183,15 +215,15 @@ const app = {
         score += hookScore;
 
         let clarityScore = 0;
-        if (post.content.length < 140) clarityScore += 10;
-        if (post.content.includes('・')) clarityScore += 10;
+        if (content.length < 140) clarityScore += 10;
+        if (content.includes('・')) clarityScore += 10;
         if (clarityScore >= 15) reasons.push('構造の明快さ：箇条書きや適切な文字数で情報の消化を助けている');
         else improvements.push('可読性の向上：箇条書きや短い文で読みやすくして');
         score += clarityScore;
 
         const valueKeywords = ['結論', '理由', '方法', 'ポイント', 'コツ', '注意', '具体的', '数字', 'データ'];
         let valueScore = 0;
-        valueKeywords.forEach(kw => { if (post.content.includes(kw)) valueScore += 3; });
+        valueKeywords.forEach(kw => { if (content.includes(kw)) valueScore += 3; });
         valueScore = Math.min(20, valueScore);
         if (valueScore >= 12) reasons.push('提供価値：独自の知見や明快な結論が提示されている');
         else improvements.push('価値の追加：その投稿を読むことで読者が得られる「独自の学び」を強調して');
@@ -204,8 +236,8 @@ const app = {
         score += ctaScore;
 
         let impactScore = 5;
-        if (post.persona.length > 20) impactScore += 10;
-        if (post.title.length < 40) impactScore += 10;
+        if (persona.length > 20) impactScore += 10;
+        if (title.length < 40) impactScore += 10;
         score += impactScore;
 
         score = Math.min(100, Math.max(0, score));
@@ -267,12 +299,13 @@ const app = {
             }
         });
 
-        // モーダル
+        // モーダル（要素が無くても落ちない）
         const modalOverlay = document.getElementById('modalOverlay');
         const modalClose = document.getElementById('modalClose');
-        modalOverlay.addEventListener('click', () => this.closeModal());
-        modalClose.addEventListener('click', () => this.closeModal());
-        document.querySelector('.modal-content').addEventListener('click', e => e.stopPropagation());
+        if (modalOverlay) modalOverlay.addEventListener('click', () => this.closeModal());
+        if (modalClose) modalClose.addEventListener('click', () => this.closeModal());
+        const modalContent = document.querySelector('.modal-content');
+        if (modalContent) modalContent.addEventListener('click', e => e.stopPropagation());
     },
 
     switchView(view) {
@@ -443,7 +476,8 @@ const app = {
     },
 
     updateStats() {
-        document.getElementById('totalPosts').textContent = this.allPosts.length;
+        const el = document.getElementById('totalPosts');
+        if (el) el.textContent = this.allPosts.length;
     },
 
     renderPosts() {
@@ -653,8 +687,10 @@ const app = {
     },
 
     hideLoading() {
+        const el = document.getElementById('loading');
+        if (!el) return;
         setTimeout(() => {
-            document.getElementById('loading').classList.add('hidden');
+            el.classList.add('hidden');
         }, 500);
     }
 };
@@ -662,6 +698,15 @@ const app = {
 // アプリケーション起動
 document.addEventListener('DOMContentLoaded', () => {
     app.init();
+});
+
+// 起動後に何か例外が出てもローディング画面を残さない（最後の砦）
+window.addEventListener('error', () => {
+    const loading = document.getElementById('loading');
+    if (loading) loading.classList.add('hidden');
+    if (!window.__snsReady && typeof app !== 'undefined' && app.showLoadError) {
+        app.showLoadError(new Error('ページの読み込み中にエラーが発生しました'));
+    }
 });
 
 // PWA対応: サービスワーカー登録（オプション）
