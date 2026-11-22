@@ -659,7 +659,13 @@ button {
 }
 
 /* ---------- 実績テーブル ---------- */
+.results-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 .results-table {
+    min-width: 620px;
     width: 100%;
     border-collapse: collapse;
     font-size: 0.875rem;
@@ -1053,6 +1059,9 @@ button {
     }
 }
 
+/* ---------- モバイル ---------- */
+/* スマホ最適化（2026-11-22）：360px幅でも横スクロールが出ない、指で操作できる、
+   検索欄でiOSが勝手にズームしない、実績テーブルは横スクロールで見る。 */
 @media (max-width: 768px) {
     .app-shell {
         flex-direction: column;
@@ -1062,7 +1071,7 @@ button {
         width: 100%;
         height: auto;
         position: static;
-        padding: 12px 16px;
+        padding: 12px 16px 8px;
         border-right: none;
         border-bottom: 1px solid var(--border);
     }
@@ -1076,6 +1085,18 @@ button {
         overflow-x: auto;
         padding-top: 0;
         gap: 4px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .sidebar-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* メニュー折りたたみ時（スマホで画面を選んだ後や「メニュー」で閉じた時） */
+    .sidebar.nav-collapsed .sidebar-nav,
+    .sidebar.nav-collapsed .sidebar-foot {
+        display: none;
     }
 
     .nav-section,
@@ -1086,24 +1107,154 @@ button {
     .nav-item {
         width: auto;
         white-space: nowrap;
+        min-height: 44px;
+        padding: 10px 14px;
     }
 
     .menu-btn {
-        display: none;
+        display: block;
+        min-height: 44px;
+        padding: 10px 14px;
     }
 
     .topbar {
-        padding: 16px 20px;
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .page-title {
+        font-size: 1.125rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.75rem;
     }
 
     .content {
-        padding: 20px;
+        padding: 20px 16px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .post-card {
+        padding: 16px;
+    }
+
+    /* 検索欄は16px（1rem）に：iOSは16px未満の入力欄でフォーカス時に勝手にズームする */
+    .search-input {
+        min-height: 44px;
+        font-size: 1rem;
+        padding: 10px 44px 10px 16px;
+    }
+
+    .clear-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .filter-select {
+        min-height: 44px;
+        padding: 10px;
+    }
+
+    .filter-label {
+        flex-wrap: wrap;
+    }
+
+    .next-tests li {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .next-meta {
+        margin-left: 0;
+        white-space: normal;
+    }
+
+    .results-table {
+        font-size: 0.8125rem;
+    }
+
+    .results-table-wrap {
+        margin: 0 -16px;
+        padding: 0 16px;
     }
 
     .modal-content {
         margin: 0;
         border-radius: 0;
         max-height: 100vh;
+        max-height: 100dvh;
+    }
+
+    .modal-close {
+        min-height: 48px;
+        padding: 14px 20px;
+    }
+
+    .modal-header,
+    .modal-section,
+    .thread-preview-section,
+    .prediction-section {
+        padding: 16px;
+    }
+
+    .copy-btn {
+        min-height: 48px;
+        padding: 14px 12px;
+    }
+
+    .toast {
+        bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+        max-width: calc(100vw - 32px);
+    }
+
+    .empty-state {
+        padding: 48px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 16px 12px;
+    }
+
+    .topbar {
+        padding: 12px;
+    }
+
+    .page-subtitle {
+        display: none;
+    }
+
+    .stat-grid {
+        gap: 8px;
+    }
+
+    .stat-card {
+        padding: 12px 14px;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .card {
+        padding: 16px 12px;
+    }
+
+    .post-card {
+        padding: 16px 12px;
+    }
+
+    .account-split {
+        gap: 16px;
+    }
+
+    .section-head {
+        margin-bottom: 16px;
     }
 }
 

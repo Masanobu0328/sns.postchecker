@@ -271,6 +271,17 @@ const app = {
             item.addEventListener('click', () => this.switchView(item.dataset.view));
         });
 
+        // スマホ用メニューボタン：サイドバーのナビを折りたたむ／開く
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        if (menuBtn && sidebar) {
+            menuBtn.addEventListener('click', () => {
+                const collapsed = sidebar.classList.toggle('nav-collapsed');
+                menuBtn.setAttribute('aria-expanded', String(!collapsed));
+                if (!collapsed) window.scrollTo(0, 0);
+            });
+        }
+
         // 各ビュー内の検索・フィルター（ビューごとに独立）
         document.querySelectorAll('.view').forEach(view => {
             const searchInput = view.querySelector('[data-search]');
@@ -338,6 +349,13 @@ const app = {
         document.querySelectorAll('.nav-item[data-view]').forEach(item => {
             item.classList.toggle('active', item.dataset.view === view);
         });
+        // スマホでは画面を選んだらナビを折りたたみ、本文をすぐ見せる
+        if (window.innerWidth <= 768) {
+            const sidebarEl = document.getElementById('sidebar');
+            const menuBtnEl = document.getElementById('menuBtn');
+            if (sidebarEl) sidebarEl.classList.add('nav-collapsed');
+            if (menuBtnEl) menuBtnEl.setAttribute('aria-expanded', 'false');
+        }
         document.querySelectorAll('.view').forEach(section => {
             section.classList.toggle('active', section.id === 'view-' + view);
         });
@@ -474,7 +492,7 @@ const app = {
                 listEl.innerHTML = (hasPast
                     ? `<p class="note" style="margin-top:0">下の10件は2026-11-22取得時の累計（impression_count等）で、投稿から48時間後の値ではありません。投稿別のViews、ターゲット返信・フォローは未記録です。</p>`
                     : '') +
-                    `<table class="results-table"><thead><tr>
+                    `<div class="results-table-wrap"><table class="results-table"><thead><tr>
                     <th>投稿</th><th>投稿日</th><th class="num">インプレッション</th><th class="num">いいね</th><th class="num">返信</th>
                     <th class="num">再投稿</th><th class="num">ターゲット返信</th><th>判定</th>
                 </tr></thead><tbody>` + posted.map(post => {
@@ -492,7 +510,7 @@ const app = {
                         <td class="num">${this.fmtNum(r.targetReplies)}</td>
                         <td>${r.verdict || '未判定'}</td>
                     </tr>`;
-                }).join('') + `</tbody></table>`;
+                }).join('') + `</tbody></table></div>`;
                 listEl.querySelectorAll('[data-open-post]').forEach(link => {
                     link.addEventListener('click', e => {
                         e.preventDefault();

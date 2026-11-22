@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -11,7 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <title>SNS投稿ライブラリ | Masa</title>
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap"
@@ -74,7 +74,7 @@
         <!-- Main -->
         <div class="main">
             <header class="topbar">
-                <button class="menu-btn" id="menuBtn" aria-label="メニューを開く">メニュー</button>
+                <button class="menu-btn" id="menuBtn" aria-label="メニューを開く" aria-expanded="true" aria-controls="sidebarNav">メニュー</button>
                 <div class="topbar-title">
                     <h1 class="page-title" id="pageTitle">ダッシュボード</h1>
                     <p class="page-subtitle" id="pageSubtitle">マーケティングの状況をひと目で見る</p>
@@ -273,9 +273,9 @@
         <p>読み込み中...</p>
     </div>
 
-    <script src="data.js?v=8"></script>
-    <script src="marketing.js?v=8"></script>
-    <script src="app.js?v=8"></script>
+    <script src="data.js?v=9"></script>
+    <script src="marketing.js?v=9"></script>
+    <script src="app.js?v=9"></script>
     <script>
         // 最後の砦：app.js が起動しなくてもローディング画面を残さない。
         // 6秒たってもアプリが起動完了の合図（window.__snsReady）を出さなければ、
