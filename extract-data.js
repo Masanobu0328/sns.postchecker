@@ -1,5 +1,10 @@
 // Markdownファイルから投稿データを抽出するスクリプト
 // Node.jsで実行してdata.jsを生成する
+//
+// 注意（2026-11-22）: マーケティング情報（status / pillar / hookType など）は
+// marketing.js で管理している。data.js は生成物のため直接編集しないこと。
+// また、読み元のMarkdownはローカルのWindowsパス（Obsidian Vault）で、
+// リポジトリ内には存在しない。GitHub上だけでは再生成できない。
 
 import fs from 'fs';
 import path from 'path';

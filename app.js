@@ -1,6 +1,9 @@
 // アプリケーションの状態管理
 const app = {
     currentCategory: 'all',
+    currentPillar: 'all',
+    currentStatus: 'all',
+    currentHook: 'all',
     searchQuery: '',
     allPosts: [],
     filteredPosts: [],
@@ -16,11 +19,45 @@ const app = {
         this.allPosts = [];
         let globalId = 1;
 
+        // 新カテゴリーの表示情報を補う（marketing.js）
+        if (typeof newCategoryInfo !== 'undefined') {
+            Object.keys(newCategoryInfo).forEach(cat => {
+                if (!categoryInfo[cat]) categoryInfo[cat] = newCategoryInfo[cat];
+            });
+        }
+
         Object.keys(postsData).forEach(category => {
             postsData[category].forEach(post => {
-                const prediction = this.generatePrediction(post);
-                this.allPosts.push({
+                // マーケティング拡張は marketing.js で管理（data.js は生成物のため直接編集しない）
+                const marketing = (typeof categoryMarketing !== 'undefined' && categoryMarketing[category]) || {};
+                const enriched = {
+                    status: 'draft',
+                    pillar: null,
+                    hookType: null,
+                    account: 'personal',
+                    source: '',
+                    postedAt: null,
+                    postUrl: null,
+                    result48h: null,
+                    nextAction: '',
+                    intent: '',
+                    ...marketing,
                     ...post,
+                    // data.js に拡張フィールドが無い場合は marketing.js の値を残す
+                    status: post.status || marketing.status || 'draft',
+                    pillar: post.pillar || marketing.pillar || null,
+                    hookType: post.hookType || marketing.hookType || null,
+                    account: post.account || marketing.account || 'personal',
+                    source: post.source || marketing.source || '',
+                    postedAt: post.postedAt || null,
+                    postUrl: post.postUrl || null,
+                    result48h: post.result48h || null,
+                    nextAction: post.nextAction || marketing.nextAction || '',
+                    intent: post.intent || marketing.intent || ''
+                };
+                const prediction = this.generatePrediction(enriched);
+                this.allPosts.push({
+                    ...enriched,
                     globalId: globalId++,
                     category: category,
                     categorySlug: categoryInfo[category].slug,
@@ -32,9 +69,43 @@ const app = {
             });
         });
 
+        // 2026-11-22のThreads短文候補6件を追加（既存200件は上書きしない）
+        if (typeof newShortPosts !== 'undefined') {
+            newShortPosts.forEach(post => {
+                const prediction = this.generatePrediction(post);
+                this.allPosts.push({
+                    ...post,
+                    globalId: globalId++,
+                    categorySlug: (categoryInfo[post.category] || {}).slug || 'threads-short',
+                    engagementScore: prediction.score,
+                    scoreLevel: prediction.level,
+                    predictionReasons: prediction.reasons,
+                    improvements: prediction.improvements
+                });
+            });
+        }
+
         this.filteredPosts = [...this.allPosts];
+        this.updateDashboard();
         this.updateStats();
         this.renderPosts();
+    },
+
+    // 表示用に整形: ハッシュタグと「**文字数**: N文字」の行を除く（data.js の原文は残す）
+    cleanDisplay(content) {
+        return (content || '')
+            .replace(/\*\*文字数\*\*:?\s*\d+文字/g, '')
+            .replace(/#[^\s#]+/g, '')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
+    },
+
+    pillarLabel(post) {
+        return (typeof pillarInfo !== 'undefined' && pillarInfo[post.pillar]) || post.pillar || '未分類';
+    },
+
+    statusLabel(post) {
+        return (typeof statusInfo !== 'undefined' && statusInfo[post.status]) || post.status || '下書き';
     },
 
     generatePrediction(post) {
@@ -138,15 +209,31 @@ const app = {
             this.filterPosts();
         });
 
-        // カテゴリーフィルター
-        document.querySelectorAll('.chip').forEach(chip => {
+        // 柱（pillar）フィルター
+        document.querySelectorAll('.chip[data-pillar]').forEach(chip => {
             chip.addEventListener('click', (e) => {
-                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-                e.target.classList.add('active');
-                this.currentCategory = e.target.dataset.category;
+                document.querySelectorAll('.chip[data-pillar]').forEach(c => c.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                this.currentPillar = e.currentTarget.dataset.pillar;
                 this.filterPosts();
             });
         });
+
+        // ステータス / フック型フィルター
+        const statusSelect = document.getElementById('statusFilter');
+        if (statusSelect) {
+            statusSelect.addEventListener('change', (e) => {
+                this.currentStatus = e.target.value;
+                this.filterPosts();
+            });
+        }
+        const hookSelect = document.getElementById('hookFilter');
+        if (hookSelect) {
+            hookSelect.addEventListener('change', (e) => {
+                this.currentHook = e.target.value;
+                this.filterPosts();
+            });
+        }
 
         // モーダル
         const modal = document.getElementById('postModal');
@@ -164,17 +251,60 @@ const app = {
 
     filterPosts() {
         this.filteredPosts = this.allPosts.filter(post => {
-            const matchesCategory = this.currentCategory === 'all' || post.category === this.currentCategory;
+            const matchesPillar = this.currentPillar === 'all' || post.pillar === this.currentPillar;
+            // ステータス「すべて」はアーカイブを除く。アーカイブは「アーカイブ」を選んだときだけ表示する
+            const matchesStatus = this.currentStatus === 'all'
+                ? post.status !== 'archived'
+                : post.status === this.currentStatus;
+            const matchesHook = this.currentHook === 'all' || post.hookType === this.currentHook;
             const matchesSearch = !this.searchQuery ||
                 post.title.toLowerCase().includes(this.searchQuery) ||
-                post.content.toLowerCase().includes(this.searchQuery) ||
+                this.cleanDisplay(post.content).toLowerCase().includes(this.searchQuery) ||
                 post.persona.toLowerCase().includes(this.searchQuery);
 
-            return matchesCategory && matchesSearch;
+            return matchesPillar && matchesStatus && matchesHook && matchesSearch;
         });
 
         this.updateStats();
         this.renderPosts();
+    },
+
+    updateDashboard() {
+        const counts = { draft: 0, approved: 0, posted: 0, archived: 0 };
+        this.allPosts.forEach(post => { if (counts[post.status] !== undefined) counts[post.status]++; });
+        const needsJudgement = this.allPosts.filter(post =>
+            post.status === 'posted' && !post.result48h).length;
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('countDraft', counts.draft);
+        set('countApproved', counts.approved);
+        set('countPosted', counts.posted);
+        set('countNeedsJudgement', needsJudgement);
+        set('countArchived', counts.archived);
+
+        // 次のテスト枠: 下書きの先頭3件（Threads短文候補を優先）
+        const drafts = this.allPosts.filter(post => post.status === 'draft');
+        const next = [...drafts].sort((a, b) =>
+            (a.category === 'Threads短文候補' ? 0 : 1) - (b.category === 'Threads短文候補' ? 0 : 1)
+        ).slice(0, 3);
+        const nextEl = document.getElementById('nextTests');
+        if (nextEl) {
+            nextEl.innerHTML = next.length ? next.map((post, i) =>
+                `<li><span class="next-rank">${i + 1}</span> ${this.cleanDisplay(post.content).split('\n')[0]}`
+                + ` <span class="next-meta">${this.pillarLabel(post)}${post.hookType ? ' / ' + post.hookType : ''}</span></li>`
+            ).join('') : '<li>下書きがありません</li>';
+        }
+
+        // 柱別の内訳（アーカイブを除く）
+        const pillarCounts = {};
+        this.allPosts.filter(post => post.status !== 'archived').forEach(post => {
+            pillarCounts[post.pillar] = (pillarCounts[post.pillar] || 0) + 1;
+        });
+        const pillarEl = document.getElementById('pillarBreakdown');
+        if (pillarEl) {
+            pillarEl.innerHTML = Object.keys(pillarCounts).map(pillar =>
+                `<span class="pillar-stat"><span class="pillar-name">${this.pillarLabel({ pillar })}</span> ${pillarCounts[pillar]}件</span>`
+            ).join('') || 'なし';
+        }
     },
 
     updateStats() {
@@ -201,8 +331,10 @@ const app = {
         container.innerHTML = this.filteredPosts.map(post => `
             <article class="post-card" data-id="${post.globalId}">
                 <div class="post-header-new">
-                    <span class="engagement-score score-${post.scoreLevel}">${post.engagementScore}点</span>
-                    <span class="post-category-badge">${post.category}</span>
+                    <span class="engagement-score score-${post.scoreLevel}">予測 ${post.engagementScore}点</span>
+                    <span class="post-category-badge">${this.pillarLabel(post)}</span>
+                    <span class="post-status-badge status-${post.status}">${this.statusLabel(post)}</span>
+                    ${post.hookType ? `<span class="post-hook-badge">${post.hookType}</span>` : ''}
                 </div>
                 <h2 class="post-title-large">${post.title}</h2>
                 <p class="post-preview">${this.getPreview(post.content)}</p>
@@ -220,7 +352,7 @@ const app = {
 
     getPreview(content) {
         // 最初の2行のみ表示（省略記号付き）
-        const cleanContent = content.replace(/\*\*/g, '').trim();
+        const cleanContent = this.cleanDisplay(content).replace(/\*\*/g, '').trim();
         const lines = cleanContent.split('\n');
 
         if (lines.length > 2) {
@@ -241,11 +373,12 @@ const app = {
             </div>
             
             <div class="prediction-section">
-                <h3 class="section-title">投稿予測</h3>
+                <h3 class="section-title">投稿予測（実測ではない）</h3>
                 <div class="score-display">
                     <span class="score-number score-${post.scoreLevel}">${post.engagementScore}点</span>
-                    <span class="score-label">伸びる確率: ${post.scoreLevel === 'high' ? '高' : post.scoreLevel === 'medium' ? '中' : '低'}</span>
+                    <span class="score-label">伸びる確率（予測）: ${post.scoreLevel === 'high' ? '高' : post.scoreLevel === 'medium' ? '中' : '低'}</span>
                 </div>
+                <p class="prediction-note">このスコアはフック・文字数などからのヒューリスティック予測です。実測の反応ではありません。</p>
                 <div class="prediction-details">
                     <h4>予測理由</h4>
                     <ul>
@@ -265,21 +398,34 @@ const app = {
                         <div class="thread-avatar">M</div>
                         <div class="thread-user-info">
                             <div class="thread-username">Masa</div>
-                            <div class="thread-handle">@masa</div>
+                            <div class="thread-handle">@aus_physio_masa.therapist</div>
                         </div>
                     </div>
-                    <div class="thread-content">${post.content}</div>
+                    <div class="thread-content">${this.cleanDisplay(post.content)}</div>
                     <div class="thread-actions">
                         <span class="thread-action">いいね</span>
                         <span class="thread-action">返信</span>
                         <span class="thread-action">再投稿</span>
                     </div>
                 </div>
-                <button class="copy-btn" onclick="app.copyToClipboard(\`${this.escapeForAttribute(post.content)}\`)">
+                <button class="copy-btn" onclick="app.copyToClipboard(\`${this.escapeForAttribute(this.cleanDisplay(post.content))}\`)">
                     投稿文をコピー
                 </button>
             </div>
             
+            <div class="modal-section">
+                <h3 class="section-title">マーケティング</h3>
+                <div class="section-content">
+                    <p class="persona-text"><strong>狙い:</strong> ${post.intent || this.pillarLabel(post) + 'の投稿'}</p>
+                    <p class="persona-text"><strong>柱:</strong> ${this.pillarLabel(post)}${post.hookType ? ' / フック: ' + post.hookType : ''}</p>
+                    <p class="persona-text"><strong>ステータス:</strong> ${this.statusLabel(post)}${post.postedAt ? '（投稿日: ' + post.postedAt + '）' : ''}</p>
+                    <p class="persona-text"><strong>参照元:</strong> ${post.source || '未記録'}</p>
+                    <p class="persona-text"><strong>48時間の結果:</strong> ${post.result48h ? `Views ${post.result48h.views} / いいね ${post.result48h.likes} / 返信 ${post.result48h.replies} / ターゲット返信 ${post.result48h.targetReplies} / ターゲットフォロー ${post.result48h.targetFollows} / 判定: ${post.result48h.verdict}` : '未記録（投稿から48時間後に判定する）'}</p>
+                    <p class="persona-text"><strong>次にやること:</strong> ${post.nextAction || '未定'}</p>
+                    ${post.postUrl ? `<p class="persona-text"><a href="${post.postUrl}" target="_blank" rel="noopener">投稿を開く</a></p>` : ''}
+                </div>
+            </div>
+
             <div class="modal-section">
                 <h3 class="section-title">ターゲット（ペルソナ）</h3>
                 <div class="section-content">
