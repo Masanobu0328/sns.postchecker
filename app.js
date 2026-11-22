@@ -87,7 +87,10 @@ const app = {
                 postUrl: post.postUrl || null,
                 result48h,
                 nextAction: post.nextAction || marketing.nextAction || '',
-                intent: post.intent || marketing.intent || ''
+                intent: post.intent || marketing.intent || '',
+                testWeek: post.testWeek || null,
+                scheduledDate: post.scheduledDate || null,
+                scheduledTime: post.scheduledTime || null
             };
         };
 
@@ -147,6 +150,34 @@ const app = {
                 this.allPosts.push({
                     ...enriched, globalId: globalId++,
                     categorySlug: (categoryInfo[post.category] || {}).slug || 'threads-past',
+                    engagementScore: prediction.score, scoreLevel: prediction.level,
+                    predictionReasons: prediction.reasons, improvements: prediction.improvements
+                });
+            });
+        }
+
+        // 今週のテスト投稿7本（2026-11-23〜2026-11-29、1日1本）
+        if (typeof testWeekPosts !== 'undefined') {
+            testWeekPosts.forEach(post => {
+                const enriched = enrich(post, {});
+                const prediction = this.generatePrediction(enriched);
+                this.allPosts.push({
+                    ...enriched, globalId: globalId++,
+                    categorySlug: (categoryInfo[post.category] || {}).slug || 'test-week',
+                    engagementScore: prediction.score, scoreLevel: prediction.level,
+                    predictionReasons: prediction.reasons, improvements: prediction.improvements
+                });
+            });
+        }
+
+        // 改訂候補23本（2026-11-22改訂の残り）
+        if (typeof revisedCandidates !== 'undefined') {
+            revisedCandidates.forEach(post => {
+                const enriched = enrich(post, {});
+                const prediction = this.generatePrediction(enriched);
+                this.allPosts.push({
+                    ...enriched, globalId: globalId++,
+                    categorySlug: (categoryInfo[post.category] || {}).slug || 'revised-candidates',
                     engagementScore: prediction.score, scoreLevel: prediction.level,
                     predictionReasons: prediction.reasons, improvements: prediction.improvements
                 });
@@ -417,14 +448,15 @@ const app = {
         }
 
         const drafts = this.allPosts.filter(post => post.status === 'draft');
+        const nextRank = (post) => post.category === '今週のテスト投稿' ? 0 : (post.category === 'Threads短文候補' ? 1 : 2);
         const next = [...drafts].sort((a, b) =>
-            (a.category === 'Threads短文候補' ? 0 : 1) - (b.category === 'Threads短文候補' ? 0 : 1)
+            (nextRank(a) - nextRank(b)) || ((a.scheduledDate || '') < (b.scheduledDate || '') ? -1 : 1)
         ).slice(0, 3);
         const nextEl = document.getElementById('nextTests');
         if (nextEl) {
             nextEl.innerHTML = next.length ? next.map((post, i) =>
                 `<li><span class="next-rank">${i + 1}</span> ${this.cleanDisplay(post.content).split('\n')[0]}` +
-                `<span class="next-meta">${this.pillarLabel(post)}${post.hookType ? ' / ' + post.hookType : ''}</span></li>`
+                `<span class="next-meta">${this.pillarLabel(post)}${post.hookType ? ' / ' + post.hookType : ''}${post.scheduledDate ? ' / ' + post.scheduledDate + ' ' + (post.scheduledTime || '') : ''}</span></li>`
             ).join('') : '<li>下書きがありません</li>';
         }
 
