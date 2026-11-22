@@ -43,6 +43,29 @@
         </div>
     </header>
 
+    <!-- Marketing Dashboard -->
+    <section class="dashboard" id="dashboard">
+        <div class="dashboard-inner">
+            <h2 class="dashboard-title">マーケティング状況</h2>
+            <div class="dashboard-counts">
+                <div class="dashboard-count"><span class="dashboard-number" id="countDraft">0</span><span class="dashboard-label">下書き</span></div>
+                <div class="dashboard-count"><span class="dashboard-number" id="countApproved">0</span><span class="dashboard-label">承認待ち</span></div>
+                <div class="dashboard-count"><span class="dashboard-number" id="countPosted">0</span><span class="dashboard-label">投稿済み</span></div>
+                <div class="dashboard-count"><span class="dashboard-number" id="countNeedsJudgement">0</span><span class="dashboard-label">要判定（48h経過）</span></div>
+                <div class="dashboard-count"><span class="dashboard-number" id="countArchived">0</span><span class="dashboard-label">アーカイブ</span></div>
+            </div>
+            <div class="dashboard-next">
+                <h3 class="dashboard-subtitle">次のテスト枠（下書きの先頭3件）</h3>
+                <ol class="next-tests" id="nextTests"></ol>
+                <p class="dashboard-note">判定は投稿から48時間後。ヒットの目安：ターゲット返信5件以上、またはターゲットフォロー3人以上。</p>
+            </div>
+            <div class="dashboard-pillars">
+                <h3 class="dashboard-subtitle">柱別の内訳（アーカイブを除く）</h3>
+                <div class="pillar-breakdown" id="pillarBreakdown"></div>
+            </div>
+        </div>
+    </section>
+
     <!-- Search & Filter -->
     <div class="search-section">
         <div class="search-container">
@@ -60,10 +83,30 @@
         </div>
 
         <div class="filter-chips">
-            <button class="chip active" data-category="all">すべて</button>
-            <button class="chip" data-category="AIリテラシー">AI</button>
-            <button class="chip" data-category="ビジネス戦略">ビジネス</button>
-            <button class="chip" data-category="学習と習慣">学習</button>
+            <button class="chip active" data-pillar="all">すべて</button>
+            <button class="chip" data-pillar="overseas">海外キャリア</button>
+            <button class="chip" data-pillar="ai-daily">AIと働く日常</button>
+            <button class="chip" data-pillar="building-kinapse">Kinapseを作る</button>
+            <button class="chip" data-pillar="clinical-kinapse-only">臨床（Kinapse用）</button>
+        </div>
+        <div class="filter-selects">
+            <label class="filter-select-label">ステータス
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">すべて（アーカイブを除く）</option>
+                    <option value="draft">下書き</option>
+                    <option value="approved">承認待ち</option>
+                    <option value="posted">投稿済み</option>
+                    <option value="archived">アーカイブ</option>
+                </select>
+            </label>
+            <label class="filter-select-label">フックの型
+                <select id="hookFilter" class="filter-select">
+                    <option value="all">すべて</option>
+                    <option value="ツッコミ">ツッコミ</option>
+                    <option value="知識引き出し">知識引き出し</option>
+                    <option value="AI機能を聞く">AI機能を聞く</option>
+                </select>
+            </label>
         </div>
     </div>
 
@@ -96,6 +139,7 @@
     </div>
 
     <script src="data.js"></script>
+    <script src="marketing.js"></script>
     <script src="app.js"></script>
 </body>
 
