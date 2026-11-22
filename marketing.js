@@ -360,9 +360,363 @@ const accountBaseline = {
     note: "28日・90日ウィンドウの返信0件は、その期間に新規投稿がなかったためで、過去の投稿への返信が0件だったという意味ではない。"
 };
 
+
+ // 今週のテスト投稿 7本（2026-11-23 Mon 〜 2026-11-29 Sun、20:30 Brisbane / 19:30 Japan、1日1本）
+ // 投稿ルール（docs/POSTING_RULES.md）に従う。短い質問＋強い個人の意見。
+ // 意見がある投稿には「教えてください」をつけない。意見がない投稿にだけつける。
+ // 投稿自体はこのPRでは行わない。Threadsにスケジュール機能はないため、毎回その場で承認を得て即投稿する。
+ // 曜日は date -d で確認済み（2026-11-23 月 〜 2026-11-29 日）。
+ const testWeekPosts = [
+    {
+        id: 1, category: "今週のテスト投稿",
+        title: 'セラピストが職場を選ぶなら、何で決めますか？年収、働き方、人。私は絶対、人派です',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストが職場を選ぶなら、何で決めますか？年収、働き方、人。私は絶対、人派です',
+        status: "draft", pillar: "overseas", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        testWeek: "2026-11-23", scheduledDate: "2026-11-23", scheduledTime: "20:30",
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '職場選びの軸を聞く。強い意見（絶対、人派です）で反論を呼ぶ。'
+    },
+    {
+        id: 2, category: "今週のテスト投稿",
+        title: 'お金が十分にあっても、セラピスト続けますか？私は絶対、続けます',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'お金が十分にあっても、セラピスト続けますか？私は絶対、続けます',
+        status: "draft", pillar: "overseas", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        testWeek: "2026-11-23", scheduledDate: "2026-11-24", scheduledTime: "20:30",
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: 'お金と仕事の意味を問う。強い意見で共感・反論を呼ぶ。'
+    },
+    {
+        id: 3, category: "今週のテスト投稿",
+        title: 'AIが導入されたら、未来の理学療法ってどうなると思いますか？私は、セラピストの仕事は残ると思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'AIが導入されたら、未来の理学療法ってどうなると思いますか？私は、セラピストの仕事は残ると思う',
+        status: "draft", pillar: "ai-daily", hookType: "未来を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        testWeek: "2026-11-23", scheduledDate: "2026-11-25", scheduledTime: "20:30",
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: 'AI導入後の未来像を聞く。セラピストの仕事が残るという意見つき。'
+    },
+    {
+        id: 4, category: "今週のテスト投稿",
+        title: 'セラピストとして、AIより人間が優れている場所ってどこですか？私は、触って感じることだと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストとして、AIより人間が優れている場所ってどこですか？私は、触って感じることだと思う',
+        status: "draft", pillar: "ai-daily", hookType: "知識引き出し", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        testWeek: "2026-11-23", scheduledDate: "2026-11-26", scheduledTime: "20:30",
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: 'AIより人間が優れている場所を引き出す。'
+    },
+    {
+        id: 5, category: "今週のテスト投稿",
+        title: '今の理学療法の学生さんって、AI使って勉強してますか？教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '今の理学療法の学生さんって、AI使って勉強してますか？教えてください',
+        status: "draft", pillar: "ai-daily", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        testWeek: "2026-11-23", scheduledDate: "2026-11-27", scheduledTime: "20:30",
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。学生のAI利用の実態を聞く。'
+    },
+    {
+        id: 6, category: "今週のテスト投稿",
+        title: 'PTの勉強って、暗記と考える力、どっちが大事ですか？私は圧倒的に、考える力だと思います',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'PTの勉強って、暗記と考える力、どっちが大事ですか？私は圧倒的に、考える力だと思います',
+        status: "draft", pillar: "building-kinapse", hookType: "二択で聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        testWeek: "2026-11-23", scheduledDate: "2026-11-28", scheduledTime: "20:30",
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '暗記と考える力の二択。強い意見（圧倒的に）で議論を呼ぶ。'
+    },
+    {
+        id: 7, category: "今週のテスト投稿",
+        title: 'セラピストにとって、知識とコミュニケーション、どっちが大事ですか？私は圧倒的に、コミュニケーションだと思います',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストにとって、知識とコミュニケーション、どっちが大事ですか？私は圧倒的に、コミュニケーションだと思います',
+        status: "draft", pillar: "building-kinapse", hookType: "二択で聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        testWeek: "2026-11-23", scheduledDate: "2026-11-29", scheduledTime: "20:30",
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '知識とコミュニケーションの二択。強い意見（圧倒的に）で議論を呼ぶ。'
+    }
+];
+
+ // 改訂候補（2026-11-22改訂の残り23本）
+ // 今週のテスト投稿7本と重複するもの（職場選び／お金があっても続けるか／AI導入後の未来／AIより人間が優れている場所／学生のAI利用／暗記と考える力／知識とコミュニケーション）は除く。
+ // 意見がある投稿には「教えてください」をつけない。「何だと思う？」は使わない。
+ const revisedCandidates = [
+    {
+        id: 1, category: "投稿候補（改訂）",
+        title: '日本のPTの給料と、こっちの働き方を比べると、壁は金額だけじゃないと思う。私は、働き方の選択肢の少なさだと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '日本のPTの給料と、こっちの働き方を比べると、壁は金額だけじゃないと思う。私は、働き方の選択肢の少なさだと思う',
+        status: "draft", pillar: "overseas", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '給料の壁の正体は働き方の選択肢の少なさ、という意見つき。'
+    },
+    {
+        id: 2, category: "投稿候補（改訂）",
+        title: '日本のPTが海外で働くのに、一番の壁って何ですか？教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '日本のPTが海外で働くのに、一番の壁って何ですか？教えてください',
+        status: "draft", pillar: "overseas", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。海外就職の壁を聞く。'
+    },
+    {
+        id: 3, category: "投稿候補（改訂）",
+        title: '海外で働くセラピストと、日本で働くセラピスト。違いって何ですか？教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '海外で働くセラピストと、日本で働くセラピスト。違いって何ですか？教えてください',
+        status: "draft", pillar: "overseas", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。日豪の働き方の違いを聞く。'
+    },
+    {
+        id: 4, category: "投稿候補（改訂）",
+        title: '日本の理学療法士と、海外の理学療法士の違いは何ですか？私は、働き方の自由さだと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '日本の理学療法士と、海外の理学療法士の違いを教えてください。私は、働き方の自由さだと思う',
+        status: "draft", pillar: "overseas", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見があるため文末の「教えてください」は外し、冒頭の問いかけのみ残す。働き方の自由さという意見つき。'
+    },
+    {
+        id: 5, category: "投稿候補（改訂）",
+        title: 'セラピストが海外で働くとき、一番大事なのって何ですか？英語？技術？人？私は人だと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストが海外で働くとき、一番大事なのって何ですか？英語？技術？人？私は人だと思う',
+        status: "draft", pillar: "overseas", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '海外で働くときに大事なものを聞く。人だという意見つき。'
+    },
+    {
+        id: 6, category: "投稿候補（改訂）",
+        title: '日本のPTが海外就職を考えるとき、何から調べますか？教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '日本のPTが海外就職を考えるとき、何から調べますか？教えてください',
+        status: "draft", pillar: "overseas", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。海外就職の調べ方を聞く。'
+    },
+    {
+        id: 7, category: "投稿候補（改訂）",
+        title: '海外のセラピストの働き方で、日本でも取り入れたいものって何ですか？教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '海外のセラピストの働き方で、日本でも取り入れたいものって何ですか？教えてください',
+        status: "draft", pillar: "overseas", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。海外の働き方で取り入れたいものを聞く。'
+    },
+    {
+        id: 8, category: "投稿候補（改訂）",
+        title: 'セラピストとして海外で働くなら、給料と休み、どっちを取りますか？私は休みだと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストとして海外で働くなら、給料と休み、どっちを取りますか？私は休みだと思う',
+        status: "draft", pillar: "overseas", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '給料と休みの二択。休みだという意見つき。'
+    },
+    {
+        id: 9, category: "投稿候補（改訂）",
+        title: 'セラピストとしてAIを使うとしたら、どんな使い方がありますか？私は、文献を調べるのに使いたい',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストとしてAIを使うとしたら、どんな使い方がありますか？私は、文献を調べるのに使いたい',
+        status: "draft", pillar: "ai-daily", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: 'AIの使い方を聞く。文献調べという意見つき。'
+    },
+    {
+        id: 10, category: "投稿候補（改訂）",
+        title: 'AIに文献を調べてもらうのと、自分で読むの、どっちがいいですか？私は、両方だと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'AIに文献を調べてもらうのと、自分で読むの、どっちがいいですか？私は、両方だと思う',
+        status: "draft", pillar: "ai-daily", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '文献調べと自分で読むの二択。両方だという意見つき。'
+    },
+    {
+        id: 11, category: "投稿候補（改訂）",
+        title: 'セラピストの仕事で、AIに任せていいことって何ですか？私は、ノートの下書きだと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストの仕事で、AIに任せていいことって何ですか？私は、ノートの下書きだと思う',
+        status: "draft", pillar: "ai-daily", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: 'AIに任せていい仕事を聞く。ノートの下書きという意見つき。'
+    },
+    {
+        id: 12, category: "投稿候補（改訂）",
+        title: 'AIがあっても、教科書は必要だと思いますか？私は、必要だと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'AIがあっても、教科書は必要だと思いますか？私は、必要だと思う',
+        status: "draft", pillar: "ai-daily", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '教科書の必要性を聞く。必要だという意見つき。'
+    },
+    {
+        id: 13, category: "投稿候補（改訂）",
+        title: '臨床の「なぜ」を、AIに聞くのと先輩に聞くの、どっちに聞いてますか？私は、先輩だと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '臨床の「なぜ」を、AIに聞くのと先輩に聞くの、どっちに聞いてますか？私は、先輩だと思う',
+        status: "draft", pillar: "ai-daily", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '臨床の「なぜ」の聞き先を聞く。先輩だという意見つき。'
+    },
+    {
+        id: 14, category: "投稿候補（改訂）",
+        title: 'AIが普及した10年後のPTって、どんな姿になってると思いますか？私は、考える力がもっと大事になると思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'AIが普及した10年後のPTって、どんな姿になってると思いますか？私は、考える力がもっと大事になると思う',
+        status: "draft", pillar: "ai-daily", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '10年後のPT像を聞く。考える力が大事になるという意見つき。'
+    },
+    {
+        id: 15, category: "投稿候補（改訂）",
+        title: 'セラピストとして、AIに聞く前に自分で考えることって何ですか？私は、仮説を立てることだと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストとして、AIに聞く前に自分で考えることって何ですか？私は、仮説を立てることだと思う',
+        status: "draft", pillar: "ai-daily", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: 'AIに聞く前に自分で考えることを聞く。仮説を立てることという意見つき。'
+    },
+    {
+        id: 16, category: "投稿候補（改訂）",
+        title: '論文を読んで、臨床でどうやって使いますか？セラピストの皆さんは、どうやって論文を読んでますか？教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '論文を読んで、臨床でどうやって使いますか？セラピストの皆さんは、どうやって論文を読んでますか？教えてください',
+        status: "draft", pillar: "building-kinapse", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。論文の読み方・使い方を聞く。'
+    },
+    {
+        id: 17, category: "投稿候補（改訂）",
+        title: '臨床の「なぜ」、疑問を持ったとき、AIに聞くのと先輩に聞くの、どっちに聞いてますか？教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '臨床の「なぜ」、疑問を持ったとき、AIに聞くのと先輩に聞くの、どっちに聞いてますか？教えてください',
+        status: "draft", pillar: "building-kinapse", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。臨床の疑問の聞き先を聞く。'
+    },
+    {
+        id: 18, category: "投稿候補（改訂）",
+        title: 'AIがあっても、教科書は必要だと思いますか？セラピストの皆さんは、教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'AIがあっても、教科書は必要だと思いますか？セラピストの皆さんは、教えてください',
+        status: "draft", pillar: "building-kinapse", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。教科書の必要性を聞く。'
+    },
+    {
+        id: 19, category: "投稿候補（改訂）",
+        title: '理学療法士って、肉体労働ですか、知的労働ですか？私は、両方だと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '理学療法士って、肉体労働ですか、知的労働ですか？私は、両方だと思う',
+        status: "draft", pillar: "building-kinapse", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '肉体労働と知的労働の二択。両方だという意見つき。'
+    },
+    {
+        id: 20, category: "投稿候補（改訂）",
+        title: 'AIが普及した10年後のPTって、どんな姿になってると思いますか？セラピストの皆さん、教えてください',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'AIが普及した10年後のPTって、どんな姿になってると思いますか？セラピストの皆さん、教えてください',
+        status: "draft", pillar: "building-kinapse", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '意見なしのため「教えてください」つき。10年後のPT像を聞く。'
+    },
+    {
+        id: 21, category: "投稿候補（改訂）",
+        title: '臨床の経験を、AIに残す方法って何ですか？私は、思考の過程を残すことだと思います',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '臨床の経験を、AIに残す方法って何ですか？私は、思考の過程を残すことだと思います',
+        status: "draft", pillar: "building-kinapse", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '「何だと思う？」は使わず「何ですか？」に言い換えた。思考の過程を残すという意見つき。'
+    },
+    {
+        id: 22, category: "投稿候補（改訂）",
+        title: 'セラピストの臨床の思考を、AIに残すって必要だと思いますか？私は、必要だと思う',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: 'セラピストの臨床の思考を、AIに残すって必要だと思いますか？私は、必要だと思う',
+        status: "draft", pillar: "building-kinapse", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '臨床の思考をAIに残す必要性を聞く。必要だという意見つき。'
+    },
+    {
+        id: 23, category: "投稿候補（改訂）",
+        title: '臨床の思考を次の世代に残す方法って、何ですか？私は、ノートに残すことだと思います',
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: '臨床の思考を次の世代に残す方法って、何ですか？私は、ノートに残すことだと思います',
+        status: "draft", pillar: "building-kinapse", hookType: "意見を聞く", account: "personal",
+        source: "2026-11-22 投稿ルール改訂（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する。",
+        intent: '「何だと思う？」は使わず「何ですか？」に言い換えた。ノートに残すという意見つき。'
+    }
+];
+
 // 新カテゴリーの表示情報（data.js の categoryInfo に無ければ app.js が補う）
 const newCategoryInfo = {
     "Threads短文候補": { color: "var(--gradient-1)", icon: "", slug: "threads-short" },
     "Kinapse 解剖リール01": { color: "var(--gradient-1)", icon: "", slug: "kinapse-reel01" },
-    "Threads過去実績": { color: "var(--gradient-1)", icon: "", slug: "threads-past" }
+    "Threads過去実績": { color: "var(--gradient-1)", icon: "", slug: "threads-past" },
+    "今週のテスト投稿": { color: "var(--gradient-1)", icon: "", slug: "test-week" },
+    "投稿候補（改訂）": { color: "var(--gradient-1)", icon: "", slug: "revised-candidates" }
 };
