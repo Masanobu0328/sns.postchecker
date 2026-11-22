@@ -1,4 +1,4 @@
-// マーケティング用の拡張データ（2026-11-22 ダッシュボード化で追加、2026-11-22 UIリデザインv2で拡張）
+// マーケティング用の拡張データ（2026-11-22 ダッシュボード化で追加、2026-11-22 UIリデザインv2で拡張、2026-11-22 過去Threads実績を追加）
 // data.js は extract-data.js の生成物のため直接編集しない。
 // 柱・ステータスなどのマーケティング情報はこのファイルで管理し、app.js が読み込み時に統合する。
 
@@ -25,13 +25,13 @@ const accountInfo = {
 };
 
 // 48時間後の実績フィールド（すべて未記録の場合は null）
-// impressions: インプレッション数 / views: Views / likes / replies: 返信数
+// impressions: インプレッション数 / views: Views / likes / replies: 返信数 / reposts: 再投稿数
 // targetReplies: ターゲット（日本のPT・PT学生）からの返信数
 // targetFollows: 投稿がきっかけのターゲットフォロー数
 // followersBefore / followersAfter: 投稿前後のフォロワー数 / followerDelta: 増減（算出値）
 function emptyResult48h() {
     return {
-        impressions: null, views: null, likes: null, replies: null,
+        impressions: null, views: null, likes: null, replies: null, reposts: null,
         targetReplies: null, targetFollows: null,
         followersBefore: null, followersAfter: null, followerDelta: null,
         verdict: null
@@ -188,8 +188,181 @@ const kinapsePosts = [
     }
 ];
 
+// 過去のThreads実績（2026-11-22取得。個人アカウント @aus_physio_masa.therapist）
+// 出典：threads-cli の top-posts（期間 2025-01-01〜2026-11-22、指標 impression_count、タイムゾーン Australia/Brisbane）。
+// 数字は取得時点（2026-11-22）の累計で、投稿から48時間後の値ではない。投稿別の Views は取得していないため views は null。
+// replies は直接返信数（direct_reply_count）。targetReplies / targetFollows はこの集計からは判定できないため null のまま。
+// 投稿の全文はここには載せない。title / content はトピックの短い題名のみ。
+// ライブラリの既存200件との照合：キーフレーズ（1000万円の壁、日本は住むのに最高な国、AIを過信、日本のPTの給料が上がらない理由は？、
+// 日本の一番の資産は「人」、医療費、コンビニで働く海外の方、医療制度の違い）では一致なし。
+// 「日本は便利すぎる」は既存200件に同名の題名が1件あるが、内容は24時間営業・店休日の話で投稿（2026-01-26）とは角度が違い、
+// 投稿コード・投稿日の一致もないため一致とみなさない。よって既存200件への紐づけは0件で、ここに10件を新規追加する。
+const pastThreadsPosts = [
+    {
+        id: 1, category: "Threads過去実績",
+        title: "1000万円の壁 — オーストラリアでPTになるのを諦めた理由",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "1000万円の壁 — オーストラリアでPTになるのを諦めた理由",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2026-03-16", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DV74aU3AcoX",
+        result48h: { impressions: 9064, views: null, likes: 35, replies: 7, reposts: 0, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 2, category: "Threads過去実績",
+        title: "日本のPTの給料が上がらない理由は？",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "日本のPTの給料が上がらない理由は？",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2026-01-11", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DTWLzZHE9jz",
+        result48h: { impressions: 8794, views: null, likes: 7, replies: 19, reposts: 0, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 3, category: "Threads過去実績",
+        title: "日本は住むのに最高な国",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "日本は住むのに最高な国",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2026-01-09", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DTR9_TIDPco",
+        result48h: { impressions: 7224, views: null, likes: 134, replies: 29, reposts: 2, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 4, category: "Threads過去実績",
+        title: "日本とオーストラリアの医療制度の違い",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "日本とオーストラリアの医療制度の違い",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2025-12-12", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DSJq39tgcPe",
+        result48h: { impressions: 5432, views: null, likes: 31, replies: 16, reposts: 2, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 5, category: "Threads過去実績",
+        title: "日本とオーストラリアの医療制度の違い（先行版）",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "日本とオーストラリアの医療制度の違い（先行版）",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2025-09-16", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DOpk5baAQwk",
+        result48h: { impressions: 4801, views: null, likes: 14, replies: 8, reposts: 0, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 6, category: "Threads過去実績",
+        title: "日本の一番の資産は「人」",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "日本の一番の資産は「人」",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2026-01-06", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DTJtgsggd0T",
+        result48h: { impressions: 4566, views: null, likes: 40, replies: 1, reposts: 0, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 7, category: "Threads過去実績",
+        title: "医療費、日本と豪州どっちが高い？",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "医療費、日本と豪州どっちが高い？",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2025-09-22", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DO5TciTAuPu",
+        result48h: { impressions: 3992, views: null, likes: 15, replies: 10, reposts: 1, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 8, category: "Threads過去実績",
+        title: "コンビニで働く海外の方への尊敬",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "コンビニで働く海外の方への尊敬",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2026-01-18", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DTom0I7DnBB",
+        result48h: { impressions: 3041, views: null, likes: 45, replies: 5, reposts: 0, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 9, category: "Threads過去実績",
+        title: "AIを過信している人、多くない？",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "AIを過信している人、多くない？",
+        status: "posted", pillar: "ai-daily", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2026-01-04", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DTEmwbagUE9",
+        result48h: { impressions: 2412, views: null, likes: 84, replies: 33, reposts: 0, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    },
+    {
+        id: 10, category: "Threads過去実績",
+        title: "日本は便利すぎる",
+        persona: "日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。",
+        content: "日本は便利すぎる",
+        status: "posted", pillar: "overseas", hookType: null, account: "personal",
+        source: "Threads top-posts 2025-01-01〜2026-11-22（impression_count）",
+        postedAt: "2026-01-26", postUrl: "https://www.threads.com/@aus_physio_masa.therapist/post/DT8xorXE27X",
+        result48h: { impressions: 2230, views: null, likes: 53, replies: 14, reposts: 1, targetReplies: null, targetFollows: null, followersBefore: null, followersAfter: null, followerDelta: null, verdict: null },
+        nextAction: "実測あり。ターゲット返信・フォローの内訳は過去データからは判定できないため未記録のままにする。",
+        intent: "過去に投稿した実績。数字は2026-11-22取得時の累計で、48時間後の値ではない。"
+    }
+];
+
+// アカウントのベースライン（2026-11-22取得。個人アカウント @aus_physio_masa.therapist）
+// 出典：threads-cli の insights-overview（指標 Views）と profile-threads（1ページ目）。
+// 28日・90日ウィンドウの返信0件は、その期間に新規投稿がなかったため。過去の投稿への返信（上位10件の直接返信数）は pastThreadsPosts を参照。
+// フォロワー数は出典が2つある：アカウントのフォロワー数（2026-11-22時点）は250、Insightsのフォロワー推移は235。数字を合わせず、両方を出典つきで載せる。
+const accountBaseline = {
+    account: "personal",
+    handle: "@aus_physio_masa.therapist",
+    retrievedAt: "2026-11-22",
+    timezone: "Australia/Brisbane",
+    lastPostAt: "2026-03-27",
+    lastPostNote: "最新投稿は2026-03-27（AI歩行分析アプリ、いいね6件）。その後は2026-03-19、2026-03-16と続き、2026-03-27以降の新規投稿はない（2026-11-22時点のプロフィール1ページ目で確認）。",
+    followersToday: 250,
+    followersNote: "アカウントのフォロワー数（2026-11-22時点）は250。Insightsのフォロワー推移は235（28日：235→235、90日：234→235）のため、出典の違う数字として両方を載せる。",
+    windows: {
+        "28d": {
+            label: "直近28日", from: "2026-10-25", to: "2026-11-22", metric: "Views",
+            views: 120, viewsFollowers: 1, viewsNonFollowers: 119, viewsChangePct: -29.8,
+            likes: 1, replies: 0, quotes: 0, reposts: 0, netFollowers: 0,
+            traffic: [
+                { source: "THREADS_SERP", label: "検索", pct: 67.5, count: 81 },
+                { source: "THREADS_PROFILE", label: "プロフィール", pct: 25.8, count: 31 },
+                { source: "THREADS_PERMALINK", label: "投稿リンク", pct: 4.2, count: 5 }
+            ],
+            followersStart: 235, followersEnd: 235, followersLastTrendDate: "2026-11-19"
+        },
+        "90d": {
+            label: "直近90日", from: "2026-08-24", to: "2026-11-22", metric: "Views",
+            views: 705, viewsFollowers: 20, viewsNonFollowers: 685, viewsChangePct: -43.0,
+            likes: 7, replies: 0, quotes: 0, reposts: 0, netFollowers: 1,
+            traffic: [
+                { source: "THREADS_SERP", label: "検索", pct: 53.8, count: 379 },
+                { source: "THREADS_PROFILE", label: "プロフィール", pct: 35.2, count: 248 },
+                { source: "THREADS_PERMALINK", label: "投稿リンク", pct: 9.1, count: 64 }
+            ],
+            followersStart: 234, followersEnd: 235, followersLastTrendDate: null
+        }
+    },
+    note: "28日・90日ウィンドウの返信0件は、その期間に新規投稿がなかったためで、過去の投稿への返信が0件だったという意味ではない。"
+};
+
 // 新カテゴリーの表示情報（data.js の categoryInfo に無ければ app.js が補う）
 const newCategoryInfo = {
     "Threads短文候補": { color: "var(--gradient-1)", icon: "", slug: "threads-short" },
-    "Kinapse 解剖リール01": { color: "var(--gradient-1)", icon: "", slug: "kinapse-reel01" }
+    "Kinapse 解剖リール01": { color: "var(--gradient-1)", icon: "", slug: "kinapse-reel01" },
+    "Threads過去実績": { color: "var(--gradient-1)", icon: "", slug: "threads-past" }
 };
