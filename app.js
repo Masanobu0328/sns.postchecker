@@ -139,6 +139,20 @@ const app = {
             });
         }
 
+        // 過去のThreads実績10件（2026-11-22取得の実測。ライブラリ209件とは別枠で、ここにだけ追加する）
+        if (typeof pastThreadsPosts !== 'undefined') {
+            pastThreadsPosts.forEach(post => {
+                const enriched = enrich(post, {});
+                const prediction = this.generatePrediction(enriched);
+                this.allPosts.push({
+                    ...enriched, globalId: globalId++,
+                    categorySlug: (categoryInfo[post.category] || {}).slug || 'threads-past',
+                    engagementScore: prediction.score, scoreLevel: prediction.level,
+                    predictionReasons: prediction.reasons, improvements: prediction.improvements
+                });
+            });
+        }
+
         this.filteredPosts = [...this.allPosts];
         this.updateDashboard();
         this.updateNavCounts();
@@ -147,7 +161,7 @@ const app = {
 
     // 実績フィールドを正規化する。未記録はすべて null のまま（数字は作らない）
     normalizeResult(result) {
-        const fields = ['impressions', 'views', 'likes', 'replies', 'targetReplies',
+        const fields = ['impressions', 'views', 'likes', 'replies', 'reposts', 'targetReplies',
             'targetFollows', 'followersBefore', 'followersAfter', 'followerDelta', 'verdict'];
         if (!result) {
             const empty = {};
@@ -257,6 +271,17 @@ const app = {
             item.addEventListener('click', () => this.switchView(item.dataset.view));
         });
 
+        // スマホ用メニューボタン：サイドバーのナビを折りたたむ／開く
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        if (menuBtn && sidebar) {
+            menuBtn.addEventListener('click', () => {
+                const collapsed = sidebar.classList.toggle('nav-collapsed');
+                menuBtn.setAttribute('aria-expanded', String(!collapsed));
+                if (!collapsed) window.scrollTo(0, 0);
+            });
+        }
+
         // 各ビュー内の検索・フィルター（ビューごとに独立）
         document.querySelectorAll('.view').forEach(view => {
             const searchInput = view.querySelector('[data-search]');
@@ -324,6 +349,13 @@ const app = {
         document.querySelectorAll('.nav-item[data-view]').forEach(item => {
             item.classList.toggle('active', item.dataset.view === view);
         });
+        // スマホでは画面を選んだらナビを折りたたみ、本文をすぐ見せる
+        if (window.innerWidth <= 768) {
+            const sidebarEl = document.getElementById('sidebar');
+            const menuBtnEl = document.getElementById('menuBtn');
+            if (sidebarEl) sidebarEl.classList.add('nav-collapsed');
+            if (menuBtnEl) menuBtnEl.setAttribute('aria-expanded', 'false');
+        }
         document.querySelectorAll('.view').forEach(section => {
             section.classList.toggle('active', section.id === 'view-' + view);
         });
@@ -424,12 +456,16 @@ const app = {
     },
 
     // 実績・分析ビュー：数字は実測だけ。未記録は「未記録」と明記し、作らない
+    // 過去10件の数字は2026-11-22取得時の累計（impression_count等）で、48時間後の値ではない
     renderResults() {
         const posted = this.allPosts.filter(post => post.status === 'posted');
         const recorded = posted.filter(post => this.hasResult(post));
         const sum = (key) => recorded.reduce((acc, p) => acc + (p.result48h[key] || 0), 0);
-        const hits = recorded.filter(p => (p.result48h.targetReplies || 0) >= 5 || (p.result48h.targetFollows || 0) >= 3).length;
-        const followerDelta = recorded.reduce((acc, p) => acc + (p.result48h.followerDelta || 0), 0);
+        const hasTargetData = recorded.some(p => p.result48h.targetReplies !== null || p.result48h.targetFollows !== null);
+        const hits = hasTargetData
+            ? recorded.filter(p => (p.result48h.targetReplies || 0) >= 5 || (p.result48h.targetFollows || 0) >= 3).length
+            : null;
+        const hasPast = posted.some(p => p.category === 'Threads過去実績');
 
         const summaryEl = document.getElementById('resultsSummary');
         if (summaryEl) {
@@ -440,31 +476,41 @@ const app = {
                   card('—', 'インプレッション合計', '未記録') +
                   card('—', 'ターゲット返信合計', '未記録') +
                   card('—', 'フォロワー増減', '未記録')
-                : card(sum('impressions').toLocaleString('ja-JP'), 'インプレッション合計', '記録済み ' + recorded.length + '件') +
-                  card(sum('replies').toLocaleString('ja-JP'), '返信合計', 'うちターゲット返信 ' + sum('targetReplies').toLocaleString('ja-JP') + '件') +
-                  card((followerDelta >= 0 ? '+' : '') + followerDelta, 'フォロワー増減', '記録済みの投稿の合計') +
-                  card(hits + ' / ' + recorded.length, 'ヒット', 'ターゲット返信5件以上 or ターゲットフォロー3人以上');
+                : card(sum('impressions').toLocaleString('ja-JP'), 'インプレッション合計', '記録済み ' + recorded.length + '件（2026-11-22取得時の累計）') +
+                  card(sum('likes').toLocaleString('ja-JP'), 'いいね合計', '記録済み ' + recorded.length + '件') +
+                  card(sum('replies').toLocaleString('ja-JP'), '返信合計', 'ターゲット返信は未記録') +
+                  card(hits === null ? '—' : hits + ' / ' + recorded.length, 'ヒット', hits === null ? 'ターゲット返信・フォローは未記録のため未判定' : 'ターゲット返信5件以上 or ターゲットフォロー3人以上');
         }
+
+        this.renderBaseline();
 
         const listEl = document.getElementById('resultsList');
         if (listEl) {
             if (posted.length === 0) {
                 listEl.innerHTML = `<div class="empty-state"><h3>まだ投稿済みのものがありません</h3><p>投稿したら、ここにインプレッション・返信・ターゲット返信・フォロワーの増減が並びます。<br>結果は投稿から48時間後に記録してください。</p></div>`;
             } else {
-                listEl.innerHTML = `<table class="results-table"><thead><tr>
-                    <th>投稿</th><th class="num">インプレッション</th><th class="num">返信</th>
-                    <th class="num">ターゲット返信</th><th class="num">フォロワー増減</th><th>判定</th>
+                listEl.innerHTML = (hasPast
+                    ? `<p class="note" style="margin-top:0">下の10件は2026-11-22取得時の累計（impression_count等）で、投稿から48時間後の値ではありません。投稿別のViews、ターゲット返信・フォローは未記録です。</p>`
+                    : '') +
+                    `<div class="results-table-wrap"><table class="results-table"><thead><tr>
+                    <th>投稿</th><th>投稿日</th><th class="num">インプレッション</th><th class="num">いいね</th><th class="num">返信</th>
+                    <th class="num">再投稿</th><th class="num">ターゲット返信</th><th>判定</th>
                 </tr></thead><tbody>` + posted.map(post => {
                     const r = post.result48h;
+                    const link = post.postUrl
+                        ? ` <a href="${post.postUrl}" target="_blank" rel="noopener">Threadsで開く</a>`
+                        : '';
                     return `<tr>
-                        <td><a href="#" data-open-post="${post.globalId}">${this.cleanDisplay(post.content).split('\n')[0]}</a></td>
+                        <td><a href="#" data-open-post="${post.globalId}">${this.cleanDisplay(post.content).split('\n')[0]}</a>${link}</td>
+                        <td>${post.postedAt || '未記録'}</td>
                         <td class="num">${this.fmtNum(r.impressions)}</td>
+                        <td class="num">${this.fmtNum(r.likes)}</td>
                         <td class="num">${this.fmtNum(r.replies)}</td>
+                        <td class="num">${this.fmtNum(r.reposts)}</td>
                         <td class="num">${this.fmtNum(r.targetReplies)}</td>
-                        <td class="num">${r.followerDelta === null ? '未記録' : (r.followerDelta >= 0 ? '+' : '') + r.followerDelta}</td>
                         <td>${r.verdict || '未判定'}</td>
                     </tr>`;
-                }).join('') + `</tbody></table>`;
+                }).join('') + `</tbody></table></div>`;
                 listEl.querySelectorAll('[data-open-post]').forEach(link => {
                     link.addEventListener('click', e => {
                         e.preventDefault();
@@ -473,6 +519,33 @@ const app = {
                 });
             }
         }
+    },
+
+    // アカウントのベースライン（28日・90日のInsights概要と最終投稿日）。数字は実測だけ
+    renderBaseline() {
+        const el = document.getElementById('resultsBaseline');
+        if (!el) return;
+        if (typeof accountBaseline === 'undefined') { el.innerHTML = ''; return; }
+        const b = accountBaseline;
+        const w28 = b.windows['28d'];
+        const w90 = b.windows['90d'];
+        const winCard = (w) =>
+            `<div class="account-split-item"><strong>${w.label}（${w.from}〜${w.to}、${w.metric}）</strong><br>` +
+            `Views ${w.views.toLocaleString('ja-JP')}（フォロワー ${w.viewsFollowers} / フォロワー以外 ${w.viewsNonFollowers}、前期間比 ${w.viewsChangePct}%） / ` +
+            `いいね ${w.likes} / 返信 ${w.replies} / 引用 ${w.quotes} / 再投稿 ${w.reposts} / フォロワー純増 ${w.netFollowers >= 0 ? '+' : ''}${w.netFollowers}<br>` +
+            `流入：${w.traffic.map(t => `${t.label} ${t.pct}%（${t.count}）`).join('、')}<br>` +
+            `フォロワー ${w.followersStart} → ${w.followersEnd}` +
+            (w.followersLastTrendDate ? `（最終推移日 ${w.followersLastTrendDate}）` : '') +
+            `</div>`;
+        el.innerHTML = `<div class="card" style="margin-top:16px"><div class="card-head"><h3>アカウントのベースライン（${b.retrievedAt}取得）</h3></div>` +
+            `<p class="note" style="margin-top:0">${b.lastPostNote}</p>` +
+            `<p class="note">アカウントのフォロワー数（${b.retrievedAt}時点）は ${b.followersToday}。${b.followersNote}</p>` +
+            winCard(w28) + winCard(w90) +
+            `<p class="note">${b.note}</p>` +
+            `<p class="note">上位10件に共通する型：実体験の書き出し＋具体的な数字・固有名詞＋議論を呼ぶ主張または鋭い1問。ほぼテキストのみで、絵文字・ハッシュタグ・リンクはほとんど使われていない。` +
+            `インプレッション上位は「1000万円の壁」9,064件（2026-03-16、impression_count）、「日本のPTの給料が上がらない理由は？」8,794件（2026-01-11）、「日本は住むのに最高な国」7,224件（2026-01-09）。` +
+            `一方で直近28日のViewsは120件（2026-10-25〜2026-11-22）、直近90日は705件（2026-08-24〜2026-11-22）と静かな状態が続いている。詳しくはREADMEの「過去のThreads実績」を参照。</p>` +
+            `</div>`;
     },
 
     updateStats() {
@@ -545,10 +618,14 @@ const app = {
                 row('フォロワー（前 → 後 / 増減）', '未記録') +
                 row('判定', '未判定');
         }
-        return row('インプレッション', this.fmtNum(r.impressions)) +
+        const pastNote = post.category === 'Threads過去実績'
+            ? row('集計', '2026-11-22取得時の累計（impression_count等）。48時間後の値ではない。投稿別のViewsは未記録。') : '';
+        return pastNote +
+            row('インプレッション', this.fmtNum(r.impressions)) +
             row('Views', this.fmtNum(r.views)) +
             row('いいね', this.fmtNum(r.likes)) +
             row('返信', this.fmtNum(r.replies)) +
+            row('再投稿', this.fmtNum(r.reposts)) +
             row('ターゲット返信', this.fmtNum(r.targetReplies)) +
             row('ターゲットフォロー', this.fmtNum(r.targetFollows)) +
             row('フォロワー（前 → 後）', `${this.fmtNum(r.followersBefore)} → ${this.fmtNum(r.followersAfter)}`) +
@@ -619,7 +696,7 @@ const app = {
             </div>
 
             <div class="modal-section">
-                <h3 class="section-title">実績（48時間後）</h3>
+                <h3 class="section-title">${post.category === 'Threads過去実績' ? '実績（2026-11-22取得時の累計）' : '実績（48時間後）'}</h3>
                 <div class="section-content">
                     ${this.resultRows(post)}
                     <p class="persona-text">判定ルール：投稿から48時間後。ヒットはターゲット返信5件以上、またはターゲットフォロー3人以上。</p>

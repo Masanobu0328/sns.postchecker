@@ -3,10 +3,10 @@
 // デプロイ後も古い index.html / app.js / data.js が無期限に返され、
 // 新しい index.html と古い app.js の組み合わせでアプリが起動せず
 // ローディング画面のまま固まった。marketing.js はキャッシュ対象外でもあった。
-// 修正：キャッシュ名を v8 に上げ、marketing.js を追加し、
+// 修正：キャッシュ名を v9 に上げ、marketing.js を追加し、
 // アプリ本体（HTML/JS/CSS）は network-first（失敗時のみキャッシュ）に変えた。
 // 画像類は従来どおり cache-first でよい。
-const CACHE_NAME = 'sns-posts-v8';
+const CACHE_NAME = 'sns-posts-v9';
 const urlsToCache = [
     './index.html',
     './style.css',
