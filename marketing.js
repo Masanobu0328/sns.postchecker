@@ -702,11 +702,138 @@ const revisedCandidates = [
     }
 ];
 
+// 2026-11-24 理学療法以外の勉強→治療の結果が出た気がする（11本、SNS執筆の法則型）
+// 個人アカウント用（@aus_physio_masa.therapist）。未承認・未投稿。Itoiが自分で編集してから使う。
+const nonPtStudyPosts = [
+    {
+        id: 1, category: "理学療法以外の勉強",
+        title: "心理学",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、心理学の本を読んでから、患者さんの話を聞くのが変わった気がする。\n結論、技術の前に、相手の気持ちを聞くようになった。\n・「なぜ痛いのか」より「どう困ってるのか」を聞く\n・相手の言葉をそのまま受け取る\n・自分の解釈を挟まない\n技術は同じなのに、結果が変わった気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなく心理学の本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 2, category: "理学療法以外の勉強",
+        title: "自己啓発",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、自己啓発の本を読んでから、患者さんへの声かけが変わった気がする。\n結論、相手を変えようとするのをやめた。\n・「やるべき」って言わない\n・相手のペースに合わせる\n・できたことを認める\nそうしたら、患者さんが自分から動くようになった気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなく自己啓発の本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 3, category: "理学療法以外の勉強",
+        title: "ビジネス",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、ビジネスの本を読んでから、治療の組み立てが変わった気がする。\n結論、患者さんを「治す対象」じゃなくて「お客さん」として見るようになった。\n・何に困ってるのかを聞く\n・何を求めてるのかを確認する\n・満足度を考える\nそうしたら、リピートが増えた気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなくビジネスの本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 4, category: "理学療法以外の勉強",
+        title: "マーケティング",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、マーケティングの本を読んでから、患者さんとの関係が変わった気がする。\n結論、技術より「この人に診てもらいたい」と思われる方が大事だと思った。\n・話を聞く\n・覚えてることを伝える\n・次を楽しみにしてもらう\nそうしたら、紹介が増えた気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなくマーケティングの本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 5, category: "理学療法以外の勉強",
+        title: "コミュニケーション",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、コミュニケーションの本を読んでから、説明の仕方が変わった気がする。\n結論、専門用語をやめて、相手の言葉で話すようになった。\n・「大腿四頭筋」じゃなくて「太ももの前の筋肉」\n・図で見せる\n・相手が分かるまで聞く\nそうしたら、患者さんが家でちゃんとやってくれるようになった気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなくコミュニケーションの本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 6, category: "理学療法以外の勉強",
+        title: "習慣",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、習慣の本を読んでから、患者さんへの宿題の出し方が変わった気がする。\n結論、大きな宿題を出すのをやめた。\n・1日1分から始める\n・できたことを褒める\n・続けられる量にする\nそうしたら、宿題をやってくる人が増えた気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなく習慣の本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 7, category: "理学療法以外の勉強",
+        title: "AI",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、AIの使い方を勉強してから、治療の準備が変わった気がする。\n結論、調べる時間が減って、考える時間が増えた。\n・文献を探すのはAIに任せる\n・自分は患者さんに合うかを考える\n・答えをそのまま信じない\nそうしたら、治療に集中できるようになった気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "ai-daily", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなくAIの本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 8, category: "理学療法以外の勉強",
+        title: "疲労・体の健康",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、疲労の本を読んでから、自分の体の健康に目を向けるようになった気がする。\n結論、疲れてから回復するより、疲れないようにする方が大事だと思った。\n・完璧にやろうとしない\n・休むことを勧める\n・無理をしない\nそうしたら、患者さんも自分も楽になった気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなく疲労・体の健康の本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 9, category: "理学療法以外の勉強",
+        title: "呼吸",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、呼吸の本を読んでから、呼吸を意識するようになった気がする。\n結論、呼吸が変わると、体の緊張が変わる気がする。\n・深く吸って、ゆっくり吐く\n・患者さんにも呼吸から入る\n・力を抜くことを伝える\nそうしたら、治療の入りが楽になった気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなく呼吸の本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 10, category: "理学療法以外の勉強",
+        title: "自己コントロール感",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、自己コントロール感の本を読んでから、治療の結果が変わった気がする。\n結論、患者さんが自分で決められるようになると、結果が出る気がする。\n・「どっちがいいですか？」って聞く\n・自分で選ばせる\n・できたことを自分で認めさせる\nそうしたら、患者さんが自分から動くようになった気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなく自己コントロール感の本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    },
+    {
+        id: 11, category: "理学療法以外の勉強",
+        title: "マネジメント",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法の勉強じゃなくて、マネジメントの本を読んでから、自分の働き方が変わった気がする。\n結論、セルフマネジメントができるようになると、治療に集中できる気がする。\n・自分の時間を管理する\n・やることを優先順位で決める\n・疲れる前に休む\nそうしたら、患者さんに向き合う余裕ができた気がする。\nエビデンスは確かめてないけど。\n\n皆さん、そういう経験ありませんか？",
+        status: "draft", pillar: "building-kinapse", hookType: "意見を述べる", account: "personal",
+        source: "2026-11-24 非PT勉強→治療結果シリーズ（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "Itoiが自分で編集してから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: '理学療法の勉強ではなくマネジメントの本を読んでから、治療の結果が出た気がする。エビデンスは確かめてない、という前提。型はSNS執筆の法則型。'
+    }
+];
+
 // 新カテゴリーの表示情報（data.js の categoryInfo に無ければ app.js が補う）
 const newCategoryInfo = {
     "Threads短文候補": { color: "var(--gradient-1)", icon: "", slug: "threads-short" },
     "Kinapse 解剖リール01": { color: "var(--gradient-1)", icon: "", slug: "kinapse-reel01" },
     "Threads過去実績": { color: "var(--gradient-1)", icon: "", slug: "threads-past" },
     "今週のテスト投稿": { color: "var(--gradient-1)", icon: "", slug: "test-week" },
-    "投稿候補（改訂）": { color: "var(--gradient-1)", icon: "", slug: "revised-candidates" }
+    "投稿候補（改訂）": { color: "var(--gradient-1)", icon: "", slug: "revised-candidates" },
+    "理学療法以外の勉強": { color: "var(--gradient-1)", icon: "", slug: "non-pt-study" }
 };
