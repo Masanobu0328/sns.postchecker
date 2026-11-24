@@ -702,11 +702,38 @@ const revisedCandidates = [
     }
 ];
 
+// 2026-11-24 今後の投稿アイデア（2本、未承認・未投稿）
+const futurePostIdeas = [
+    {
+        id: 1, category: "今後の投稿アイデア",
+        title: "先輩に聞く vs AIに聞く",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "先輩に聞くのと、AIに聞くの、どっちがいいと思いますか？",
+        status: "draft", pillar: "building-kinapse", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-24 Itoiのアイデア（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "文言を決めてから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: "先輩に聞くかAIに聞くか。2026-11-24にItoiが議題として浮かべた。意見は未定（先輩派かAI派か、Itoiの本音を入れる）。"
+    },
+    {
+        id: 2, category: "今後の投稿アイデア",
+        title: "理学療法士の皆さん、AIってどうやって使ってますか？",
+        persona: '日本の理学療法士（整形外科・20代）およびPT学生。AIに関心があり、海外キャリアも意識している。',
+        content: "理学療法士の皆さん、AIってどうやって使ってますか？\n普段の使い方を教えてください。",
+        status: "draft", pillar: "ai-daily", hookType: "実態を聞く", account: "personal",
+        source: "2026-11-24 Itoiのアイデア（Museとの検討）",
+        postedAt: null, postUrl: null, result48h: null,
+        nextAction: "文言を決めてから承認。承認されたらThreadsに即投稿（Threadsにスケジュール機能はない）。48時間後に判定する.",
+        intent: "PTのAIの普段の使い方を聞く。返信がKinapseの機能ニーズ調査になる。"
+    }
+];
+
 // 新カテゴリーの表示情報（data.js の categoryInfo に無ければ app.js が補う）
 const newCategoryInfo = {
     "Threads短文候補": { color: "var(--gradient-1)", icon: "", slug: "threads-short" },
     "Kinapse 解剖リール01": { color: "var(--gradient-1)", icon: "", slug: "kinapse-reel01" },
     "Threads過去実績": { color: "var(--gradient-1)", icon: "", slug: "threads-past" },
     "今週のテスト投稿": { color: "var(--gradient-1)", icon: "", slug: "test-week" },
-    "投稿候補（改訂）": { color: "var(--gradient-1)", icon: "", slug: "revised-candidates" }
+    "投稿候補（改訂）": { color: "var(--gradient-1)", icon: "", slug: "revised-candidates" },
+    "今後の投稿アイデア": { color: "var(--gradient-1)", icon: "", slug: "future-ideas" }
 };
